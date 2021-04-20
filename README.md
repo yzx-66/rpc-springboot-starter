@@ -20,6 +20,7 @@ mvn install
 
 
 # 可选配置说明
+* 直接配置在 application.properties
 
 远程代理类相关（必选）：
 
@@ -41,6 +42,15 @@ rpc.respone.data_filed=
 例如：rpc.respone.data_filed=data
 ```
 
+服务降级（可选）
+
+```
+# 是否开启服务降级
+rpc.hystrix.enable=
+例如：rpc.hystrix.enable=true
+```
+
+
 自动携带 token（可选）
 
 ```
@@ -48,14 +58,6 @@ rpc.respone.data_filed=
 # 因为没有统一网关，所以要让远程服务鉴权，还必须通过访问该服务时的 token
 rpc.token.name=
 例如：rpc.token.name=token
-```
-
-服务降级（可选）
-
-```
-# 是否开启服务降级
-rpc.hystrix.enable=
-例如：rpc.hystrix.enable=true
 ```
 
 网络参数（可选）
