@@ -232,23 +232,18 @@ public class TestApiFallback {
     public TestEntity testPathVariable(Integer id) {
         return new TestEntity("fallback" , "fallback");
     }
-    
     public TestEntity testParamters(Integer id1 , Integer id2){
         return new TestEntity("fallback" , "fallback");
     }
-    
     public TestEntity testPathAndParams(Integer id1 , Integer id2 , Integer id3){
         return new TestEntity("fallback" , "fallback");
     }
-    
     public TestEntity testBody(TestEntity testEntity){
         return new TestEntity("fallback" , "fallback");
     }
-    
     public TestEntity testPathAndBody(String s , TestEntity testEntity){
         return new TestEntity("fallback" , "fallback");
     }
-    
     public TestEntity testParseApiRespone(){
         return new TestEntity("fallback" , "fallback");
     }
