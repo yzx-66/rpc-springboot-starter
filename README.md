@@ -220,7 +220,6 @@ public class TestRemote {
 ### 返回值解析
 1、接口
 ```java
-// 点对点的方式
 @FeginClient(value = "127.0.0.1：8080")
 @RequestMapping("t")
 public interface TestClient {
