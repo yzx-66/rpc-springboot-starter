@@ -88,7 +88,7 @@ rpc.http.connect_timeout=
 
 * 假设服务 B 要调用服务 A
 
-## A
+## Server A
 
 现在服务 A 有该 Controller
 
@@ -147,7 +147,7 @@ public class TestController {
 }
 ```
 
-## B
+## Server B
 
 ### 1、配置与使用
 
