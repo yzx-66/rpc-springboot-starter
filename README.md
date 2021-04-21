@@ -291,7 +291,7 @@ public void testClient(){
 rpc.token.name=token
 ```
 
-# 性能测试
+# 性能压测
 
 * 测试环境:Jmeter，1000 个线程，10s，循环 10 次
 
