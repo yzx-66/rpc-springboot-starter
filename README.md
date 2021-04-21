@@ -141,7 +141,7 @@ public class TestController {
 ```
 解释：
 * 所有返回值 ApiRespone 是我 controller 业务的返回类型，与框架无关（其存放返回对象的属性为 `Object data`)
-* 所以返回的对象 TestEntity 是测试类型，与框架无关（其仅有两个属性，`String id`、`String name`）
+* 所有返回的对象 TestEntity 是测试类型，与框架无关（其仅有两个属性，`String id`、`String name`）
 
 
 ## Server B
