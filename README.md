@@ -91,8 +91,9 @@ rpc.http.connect_timeout=
 ## Server A
 
 现在服务 A 有该 Controller
-* 说明：所有返回值 ApiRespone 是我 controller 业务的返回类型，与框架无关（其存放返回对象的属性为 `Object data`)
-
+* 说明：
+  * 所有返回值 ApiRespone 是我 controller 业务的返回类型，与框架无关（其存放返回对象的属性为 `Object data`)
+  * 所以返回的对象 TestEntity 是测试类型，与框架无关（其仅有两个属性，`String id`、`String name`）
 
 ```java
 @Controller
