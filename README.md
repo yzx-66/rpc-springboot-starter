@@ -91,13 +91,14 @@ rpc.http.connect_timeout=
 ## Server A
 
 现在服务 A 有该 Controller
+* 说明：所有返回值 ApiRespone 是我 controller 业务的返回类型，与框架无关（其存放返回对象的属性为 `Object data`)
+
 
 ```java
 @Controller
 @RequestMapping("t")
 public class TestController {
 
-    // 测试解析 @PathVariable 是否生效
     //@GetMapping("/{id}")，因为与  @GetMapping("/{id1}") 冲突
     @ResponseBody
     ApiRespone testPathVariable(@PathVariable Integer id){
@@ -105,7 +106,6 @@ public class TestController {
         return ApiRespone.ok(new TestEntity("1","1"));
     }
     
-    // 测试解析多个 @RequestParam 是否生效
     @GetMapping("/ids")
     @ResponseBody
     ApiRespone testParamters(@RequestParam("id1") Integer id1 , @RequestParam("id2") Integer id2){
@@ -113,7 +113,6 @@ public class TestController {
         return ApiRespone.ok(new TestEntity("1","1"));
     }
   
-    // 测试解析 @PathVariable 与多个 @RequestParam 是否生效
     @GetMapping("/{id1}")
     @ResponseBody
     ApiRespone testPathAndParams(@PathVariable Integer id1 , @RequestParam("id2") Integer id2 , @RequestParam("id3") Integer id3){
@@ -121,7 +120,6 @@ public class TestController {
         return ApiRespone.ok(new TestEntity("1","1"));
     }
 
-    // 测试解析 @RequestBody 是否生效
     @PostMapping("/body")
     @ResponseBody
     ApiRespone testBody(@RequestBody TestEntity testEntity){
@@ -129,7 +127,6 @@ public class TestController {
         return ApiRespone.ok(new TestEntity("1","1"));
     }
 
-    // 测试解析 @PathVariable 与 @RequestBody 是否生效
     @PostMapping("/{s}")
     @ResponseBody
     ApiRespone testPathAndBody(@PathVariable String s ,@RequestBody TestEntity testEntity){
@@ -137,7 +134,6 @@ public class TestController {
         return ApiRespone.ok(new TestEntity("1","1"));
     }
 
-    // 测试不带参数是否生效
     @GetMapping("/parse")
     @ResponseBody
     ApiRespone testParseApiRespone(){
@@ -159,29 +155,35 @@ package net.yzx66.remote.client;
 @RequestMapping("t")
 public interface TestClient {
 
-    //@GetMapping("/{id}")
+    // 测试解析 @PathVariable 是否生效
+    @GetMapping("/{id}")
     @ResponseBody
-    TestEntity testPathVariable(@PathVariable Integer id);
+    ApiRespone testPathVariable(@PathVariable Integer id);
 
+    // 测试解析多个 @RequestParam 是否生效
     @GetMapping("/ids")
     @ResponseBody
-    TestEntity testParamters(@RequestParam("id1") Integer id1, @RequestParam("id2") Integer id2);
+    ApiRespone testParamters(@RequestParam("id1") Integer id1, @RequestParam("id2") Integer id2);
 
+    // 测试解析 @PathVariable 与多个 @RequestParam 是否生效
     @GetMapping("/{id1}")
     @ResponseBody
-    TestEntity testPathAndParams(@PathVariable Integer id1, @RequestParam("id2") Integer id2, @RequestParam("id3") Integer id3);
+    ApiRespone testPathAndParams(@PathVariable Integer id1, @RequestParam("id2") Integer id2, @RequestParam("id3") Integer id3);
 
+    // 测试解析 @RequestBody 是否生效
     @PostMapping("/body")
     @ResponseBody
-    TestEntity testBody(@RequestBody TestEntity testEntity);
+    ApiRespone testBody(@RequestBody TestEntity testEntity);
 
+    // 测试解析 @PathVariable 与 @RequestBody 是否生效
     @PostMapping("/{s}")
     @ResponseBody
-    TestEntity testPathAndBody(@PathVariable String s, @RequestBody TestEntity testEntity);
+    ApiRespone testPathAndBody(@PathVariable String s, @RequestBody TestEntity testEntity);
 
+    // 测试不带参数解析是否生效
     @GetMapping("/parse")
     @ResponseBody
-    TestEntity testParseApiRespone();
+    ApiRespone testParseApiRespone();
 }
 ```
 
@@ -190,18 +192,12 @@ public interface TestClient {
 ```
 # 要生成代理对象的包名（可以递归解析，所以不一定要指定到直接的一层）
 rpc.remote.package=net.yzx66.remote
-
-# 接口 controller 返回的 respone 类型
-rpc.respone.type=net.yzx66.commen.ApiRespone
-# 返回的 repone 类型里哪个属性是数据
-rpc.respone.data_filed=data
 ```
 
 说明：
 
 * 1、@FeginClient 还可以配置成 nginx 地址（即使用 nginx 代理 serverA 的集群），并指定 localtion（因为 nginx 里一般会把 localtion rewrite 掉，所以这里的 localtion 只起 nginx 里的路由作用），如 `@FeginClient(value = "127.0.0.1" , localtion = "serverA")`，然后 nginx 的 /serverA 里进行 rewrite ` rewrite ^/serverA/(.*)$ /$1 break;`
 * 2、参数 @RequestParam 必须指定参数名，因为没有使用字节码类库去读取参数名
-* 3、controller 的返回是 ApiRespon，但这里可以指定成 TestEntity 是因为配置文件指定了 ApiRespon 的类型，并且指明了哪个字段是 TestEntity 类型，如果没有在配置文件指定，那么反序列化会报错
 
 ### 2、注入代理类
 
@@ -213,11 +209,46 @@ public class TestRemote {
     TestClient testClient;
     
     public void testClient(){
-        TestEntity testEntity = testClient.testParseApiRespone();
+        // ApiRespone 的 data 属性未返回对象
+        TestEntity testEntity = (TestEntity)testClient.testParseApiRespone().getData();
         assert testEntity.getName().equals("1") && testEntity.getId().equals("1"); 
     }
 }
 ```
+
+### 返回值解析
+1、接口
+```java
+// 点对点的方式
+@FeginClient(value = "127.0.0.1：8080")
+@RequestMapping("t")
+public interface TestClient {
+    ...
+    @ResponseBody
+    TestEntity testParseApiRespone();
+}
+```
+2、配置
+```
+# 接口 controller 返回的 respone 类型
+rpc.respone.type=net.yzx66.commen.ApiRespone
+# 返回的 repone 类型里哪个属性是数据
+rpc.respone.data_filed=data
+```
+
+测试
+```java
+@Autowired
+TestClient testClient;
+    
+public void testClient(){
+    TestEntity testEntity = testClient.testParseApiRespone();
+    assert testEntity.getName().equals("1") && testEntity.getId().equals("1"); 
+}
+```
+
+说明：
+* controller 的返回是 ApiRespon，但这里可以指定成 TestEntity 是因为配置文件指定了 ApiRespon 的类型，并且指明了哪个字段是 TestEntity 类型，如果没有在配置文件指定，那么反序列化会报错
 
 ### 服务降级
 
@@ -336,10 +367,3 @@ rpc.http.connect_timeout=3
       converters.put(Date.class , new Date2StringConverter());
   }
   ```
-
-
-
-
-
-
-
